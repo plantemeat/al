@@ -85,11 +85,22 @@ Options:
   -n, --dry-run    with clean: only print what would be removed
 
 Examples:
-  al set sh12 ssh server12
-  al set sh12 as ssh server12
+  al set sh12 ssh server12                  # then: sh12  (extra args pass through: sh12 -p 2222)
+  al set sh12 as ssh server12               # 'as' is optional
+  al set status 'make -C /mnt/pubchain/starter cluster-status'
+  al set st '(cd /mnt/pubchain/starter && make cluster-status)'   # multi-step, cwd unchanged
   al set -t 7d logs 'tail -f /data/reth/reth.log | grep -i error'
+  al set g "grep 'state root' reth.log"     # command has ' -> wrap with "
+  al show status
+  al unset status st
   al clean --unused 90d
   al export | ssh server12 '~/.al/bin/al import -'
+
+Quoting:
+  If COMMAND contains  &&  ||  ;  |  >  <  $  *  wrap it in single quotes,
+  otherwise your shell splits it before al sees it:
+    al set status cd /x && make y      # WRONG: only 'cd /x' is saved, make runs now
+    al set status 'cd /x && make y'    # RIGHT (note: leaves you in /x afterwards)
 EOF
 }
 
