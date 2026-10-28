@@ -12,7 +12,7 @@
 #   AL_HOME      install dir                   (default: ~/.al)
 set -euo pipefail
 
-AL_REPO="${AL_REPO:-YOUR_GITHUB_USER/al}"
+AL_REPO="${AL_REPO:-plantemeat/al}"
 AL_REF="${AL_REF:-main}"
 AL_RAW_BASE="${AL_RAW_BASE:-https://raw.githubusercontent.com/$AL_REPO/$AL_REF}"
 AL_HOME="${AL_HOME:-$HOME/.al}"

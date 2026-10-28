@@ -16,15 +16,15 @@ al clean --unused 90d           # 清理过期的 + 90 天没用过的
 ## 安装
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USER/al/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/plantemeat/al/main/install.sh | bash
 exec $SHELL
 ```
 
 国内服务器访问 GitHub 慢：
 
 ```bash
-curl -fsSL https://ghfast.top/https://raw.githubusercontent.com/YOUR_GITHUB_USER/al/main/install.sh \
-  | AL_RAW_BASE=https://ghfast.top/https://raw.githubusercontent.com/YOUR_GITHUB_USER/al/main bash
+curl -fsSL https://ghfast.top/https://raw.githubusercontent.com/plantemeat/al/main/install.sh \
+  | AL_RAW_BASE=https://ghfast.top/https://raw.githubusercontent.com/plantemeat/al/main bash
 ```
 
 完全离线（内网机器）：
@@ -55,7 +55,7 @@ al export | ssh server12 '~/.al/bin/al import -'
 ## 卸载
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USER/al/main/install.sh | bash -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/plantemeat/al/main/install.sh | bash -s -- --uninstall
 # 保留 aliases.tsv；加 --purge 连数据一起删
 ```
 
