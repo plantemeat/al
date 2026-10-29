@@ -1,81 +1,88 @@
-# al — persistent command aliases for bash / zsh
+# al
+
+一个用于 bash / zsh 的命令别名管理工具，支持 Linux 和 macOS。
+
+SSH 登录、查看日志、运行项目脚本，这些命令经常要重复输入。长命令不好记，翻历史记录也费事；用 `alias` 保存，又要手动维护 `.bashrc` 或 `.zshrc`，临时别名用完后还容易忘记删。
+
+`al` 把命令保存成短名字，新开终端也能用。支持查看、删除、设置有效期，以及导入导出，不需要逐条修改 shell 配置。
 
 ```bash
-al set sh12 ssh server12        # 之后敲 sh12 就是 ssh server12（参数会透传：sh12 -p 2222）
-al set -t 7d logs 'tail -f /data/reth.log | grep -i error'   # 7 天后自动过期
-al unset sh12                   # 删除
-al show                         # 列出全部：状态 / 最近使用 / 过期时间 / 命令
-al clean --unused 90d           # 清理过期的 + 90 天没用过的
+al set sh12 ssh server12
+sh12                            # 执行 ssh server12
 ```
-
-- 纯 shell，零依赖（只需 `awk sort date`），Linux / macOS，bash / zsh 都能用
-- `set/unset` 当前终端立即生效，不用重开
-- 每天首次开终端时自动静默清理过期别名
-- 数据是一个 TSV：`~/.al/aliases.tsv`，可直接编辑 / 备份 / 同步
 
 ## 安装
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/plantemeat/al/main/install.sh | bash
-exec $SHELL
+exec "$SHELL"
 ```
 
-国内服务器访问 GitHub 慢：
+如果 GitHub 下载较慢，可以通过第三方镜像安装：
 
 ```bash
 curl -fsSL https://ghfast.top/https://raw.githubusercontent.com/plantemeat/al/main/install.sh \
   | AL_RAW_BASE=https://ghfast.top/https://raw.githubusercontent.com/plantemeat/al/main bash
+exec "$SHELL"
 ```
 
-完全离线（内网机器）：
+安装文件和别名数据默认放在 `~/.al/`，安装脚本会在 `.bashrc` / `.zshrc` 中添加加载配置。工具用 shell 编写，依赖系统常见命令；在线安装需要 `curl` 或 `wget`。
+
+## 基本用法
 
 ```bash
-scp -r al/ server12:/tmp/al && ssh server12 'bash /tmp/al/install.sh'
+al help
+
+# 保存命令；使用同名别名会覆盖原配置
+al set sh12 as ssh server12
+sh12 -p 2222                    # 追加参数
+
+# 包含管道、重定向或多步操作时，用引号包住整条命令
+al set logs 'tail -f /data/reth.log | grep -i error'
+logs
+
+# 临时别名，设置 7 天有效期；不指定 -t 则不过期
+al set -t 7d logs 'tail -f /data/reth.log | grep -i error'
+
+al show                         # 查看命令、最近使用时间、有效期和状态
+al show ssh                     # 按名称或命令内容查找
+al unset sh12                   # 删除别名
+
+al clean --unused 90d -n        # 预览过期或 90 天未使用的别名
+al clean --unused 90d           # 确认后清理
 ```
 
-安装只做两件事：文件放到 `~/.al/`，在 `~/.bashrc` / `~/.zshrc` 末尾追加一个 `# >>> al >>>` 块。
+通过 `al` 修改别名后，当前终端立即更新；其他已打开的终端需要重新加载。有效期在重新加载或清理时生效，不会在到期瞬间刷新当前终端。启动终端时也会定期静默清理过期别名，最多每天一次。
 
-## 命令
+## 其他命令
 
 | 命令 | 说明 |
-|---|---|
-| `al set [-t TTL] [-f] NAME [as] CMD...` | 新增/覆盖。TTL：`30m 12h 7d 2w`；`-f` 允许覆盖 PATH 里已有命令 |
-| `al unset NAME...` | 删除（别名 `rm`） |
-| `al show [关键字]` | 列表；`expired` 红色，`stale`（≥30 天未用）黄色 |
-| `al clean [--unused DUR] [-n]` | 清理过期/久未使用；`-n` 只预览 |
-| `al export` / `al import [FILE\|-]` | 导出/导入，便于多机同步 |
-| `al update` | 从安装源升级 |
+| --- | --- |
+| `al export > aliases.tsv` | 导出别名，便于备份或迁移 |
+| `al import aliases.tsv` | 合并导入，同名别名会被覆盖 |
+| `al update` | 从记录的安装源更新工具 |
+| `al help` | 查看完整用法 |
 
-同步到另一台机器：
+数据保存在 `~/.al/aliases.tsv`。`al show` 默认将 30 天未使用的别名标记为 `stale`，仅提示，不会因此自动删除；可通过 `AL_STALE_DAYS` 调整天数。
 
-```bash
-al export | ssh server12 '~/.al/bin/al import -'
-```
+## 注意事项
+
+- 别名只能包含字母、数字、`_` 和 `-`，不能以数字或 `-` 开头；`cd`、`ssh`、`sudo` 等保留名称不能使用。
+- 默认拒绝新增与已有命令重名的别名，可用 `al set -f` 强制覆盖非保留名称。
+- 保存的命令通过 `eval` 执行。只导入可信的别名文件，避免执行不明命令。
 
 ## 卸载
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/plantemeat/al/main/install.sh | bash -s -- --uninstall
-# 保留 aliases.tsv；加 --purge 连数据一起删
+bash install.sh --uninstall     # 在仓库目录执行，保留别名数据
 ```
 
-## 安全约束
-
-- 名字只允许 `[A-Za-z0-9_-]`，且不能是 `cd set unset alias rm ssh sudo ...` 等保留字
-- 默认拒绝覆盖 PATH 里已存在的命令（如 `grep`），需 `-f`
-- 命令以 `eval` 执行，等同于你自己敲；不要导入来路不明的 TSV
-
-## 配置
-
-| 变量 | 默认 | 说明 |
-|---|---|---|
-| `AL_HOME` | `~/.al` | 安装/数据目录 |
-| `AL_STALE_DAYS` | `30` | `show` 中标记 stale 的阈值 |
+追加 `--purge` 会同时删除安装目录及别名数据。卸载后重新打开终端。
 
 ## 开发
 
 ```bash
-bash tests/run.sh    # 在临时 HOME 中对 bash + zsh 跑全量用例
+bash tests/run.sh               # 在临时 HOME 中测试 bash / zsh
 ```
 
 MIT License
