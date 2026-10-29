@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="52" viewBox="0 0 600 52" role="img" aria-labelledby="title">
+  <title id="title">al set 别名 as 原始完整命令；al、set、as 标红</title>
+  <rect width="600" height="52" rx="6" fill="#f6f8fa"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16">
+    <text x="16" y="32" fill="#c43131">al</text>
+    <text x="46" y="32" fill="#c43131">set</text>
+    <text x="86" y="32" fill="#24292f" font-family="sans-serif">别名</text>
+    <text x="130" y="32" fill="#c43131">as</text>
+    <text x="160" y="32" fill="#24292f" font-family="sans-serif">原始完整命令</text>
+  </g>
+</svg>

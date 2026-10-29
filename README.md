@@ -44,9 +44,7 @@ exec "$SHELL"
 
 格式如下，`as` 可以省略：
 
-```text
-al set 别名 as 原始完整命令
-```
+![命令格式：al set 别名 as 原始完整命令（al、set、as 标红）](docs/images/al-syntax.svg)
 
 ```bash
 # 保存命令；使用同名别名会覆盖原配置
