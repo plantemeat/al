@@ -4,6 +4,8 @@
 
 一个用于 bash / zsh 的命令别名管理工具，支持 Linux 和 macOS。
 
+介绍页：https://plantemeat.github.io/al/
+
 SSH 登录、查看日志、运行项目脚本，常用命令总要反复输入。长命令不好记，翻历史记录也费事；用 `alias` 保存，又要手动维护 `.bashrc` 或 `.zshrc`。
 
 比如，在 Git 仓库里获取远程更新，经常要输入 `git fetch --all`。用 `al` 保存一次，以后输入 `fetch` 就能执行：
